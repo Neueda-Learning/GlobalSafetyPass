@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Travel Lion - 旅行助手</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="phone-frame">
+    <div class="status-bar">
+        <span class="time" id="clock">18:00</span>
+        <span>📶 🔋</span>
+    </div>
+
+    <div class="app-header">
+        <h1 id="page-title">Travel Lion</h1>
+        <p id="page-subtitle">全球安全通行证</p>
+    </div>
+
+    <div class="content">
+        <!-- Home View -->
+        <div id="view-home" class="view active">
+            <div class="card">
+                <h3>我的行程</h3>
+                <div id="trip-list"></div>
+            </div>
+            <button class="btn btn-primary" onclick="showView('setup')">+ 创建新行程</button>
+        </div>
+
+        <!-- Trip Setup View (Phase 1) -->
+        <div id="view-setup" class="view">
+            <div class="card">
+                <h3>行程设置</h3>
+                <form id="trip-form" onsubmit="createTrip(event)">
+                    <div class="form-group">
+                        <label>目的地</label>
+                        <input type="text" id="destination" placeholder="例如：Tokyo, Japan" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>出发日期</label>
+                            <input type="date" id="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>返回日期</label>
+                            <input type="date" id="endDate" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>预算</label>
+                            <input type="number" id="budget" placeholder="5000" min="1" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>货币</label>
+                            <select id="currency">
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="GBP">GBP</option>
+                                <option value="JPY">JPY</option>
+                                <option value="CNY">CNY</option>
+                                <option value="HKD">HKD</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>首选卡片</label>
+                        <div id="card-select"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">创建并检查准备度</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Readiness View (Phase 1) -->
+        <div id="view-readiness" class="view">
+            <div class="card" id="readiness-card"></div>
+            <button class="btn btn-primary" onclick="goToDashboard()">进入旅行面板</button>
+            <button class="btn btn-secondary" onclick="showView('setup')">修改行程</button>
+        </div>
+
+        <!-- Dashboard View (Phase 2) -->
+        <div id="view-dashboard" class="view">
+            <div id="dashboard-stats"></div>
+            <div class="card">
+                <h3>添加支付</h3>
+                <form id="payment-form" onsubmit="processPayment(event)">
+                    <div class="form-group">
+                        <label>商户</label>
+                        <input type="text" id="merchant" placeholder="商户名称" required>
+                    </div>
+                    <div class="form-group">
+                        <label>商户位置</label>
+                        <input type="text" id="merchantLocation" placeholder="交易发生地">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>金额</label>
+                            <input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>汇率</label>
+                            <input type="number" id="exchangeRate" placeholder="1.0" min="0.0001" step="0.0001" value="1.0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>类别</label>
+                        <div class="category-chips" id="category-chips">
+                            <span class="chip selected" data-cat="Dining">餐饮</span>
+                            <span class="chip" data-cat="Shopping">购物</span>
+                            <span class="chip" data-cat="Transport">交通</span>
+                            <span class="chip" data-cat="Hotel">酒店</span>
+                            <span class="chip" data-cat="ATM Withdrawal">ATM取款</span>
+                            <span class="chip" data-cat="Entertainment">娱乐</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>支付卡片</label>
+                        <select id="payment-card"></select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">处理支付</button>
+                </form>
+            </div>
+            <div class="section-title">交易记录</div>
+            <div class="card" id="transaction-list"></div>
+        </div>
+
+        <!-- Alerts View (Phase 3) -->
+        <div id="view-alerts" class="view">
+            <div id="alert-list"></div>
+        </div>
+
+        <!-- Cards View -->
+        <div id="view-cards" class="view">
+            <div id="card-list"></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-item active" data-view="home" onclick="showView('home')">
+            <span class="icon">🏠</span>首页
+        </button>
+        <button class="nav-item" data-view="dashboard" onclick="showView('dashboard')">
+            <span class="icon">💳</span>支付
+        </button>
+        <button class="nav-item" data-view="alerts" onclick="showView('alerts')">
+            <span class="icon">🔔</span>警报
+        </button>
+        <button class="nav-item" data-view="cards" onclick="showView('cards')">
+            <span class="icon">🎴</span>卡片
+        </button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/js/app.js"></script>
+</body>
+</html>
