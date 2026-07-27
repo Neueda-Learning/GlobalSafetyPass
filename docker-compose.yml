@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: global-safety-pass-mysql
+    environment:
+      MYSQL_DATABASE: global_safety_pass
+      MYSQL_USER: safety
+      MYSQL_PASSWORD: safety
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - global-safety-pass-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  global-safety-pass-data:
